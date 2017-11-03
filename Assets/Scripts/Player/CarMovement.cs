@@ -7,7 +7,7 @@ public class CarMovement : MonoBehaviour {
     public Vector3 velocity;
     public Vector3 steering;
     
-    private float acceleration = 10f;
+    private float acceleration = 0f;
     private float brakeAcceleration = 15f;
 
     private float resistance = 0.075f;
