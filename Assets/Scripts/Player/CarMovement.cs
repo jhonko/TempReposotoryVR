@@ -1,13 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class CarMovement : MonoBehaviour {
+public class CarMovement : MonoBehaviour
+{
+
+    public Text textbox;
+    public int speedometer;
+    public int betterspeed;
+    public string displayspeed;
+
+    public Text score;
+    public string thescore;
+    public int count;
 
     public Vector3 velocity;
     public Vector3 steering;
-    
-    private float acceleration = 0f;
+
+    private float acceleration = 10f;
     private float brakeAcceleration = 15f;
 
     private float resistance = 0.075f;
@@ -34,34 +45,47 @@ public class CarMovement : MonoBehaviour {
     public Vector3 cOM;
 
 
-    void Start () {
+    void Start()
+    {
         thisRB = GetComponent<Rigidbody>();
         thisRB.centerOfMass = cOM;
-		
-	}
-	
 
-	void Update ()
+    }
+
+
+    void Update()
     {
         //Debug.Log(gameObject.transform.rotation.x + "x");
-      //  Debug.Log(gameObject.transform.rotation.y + "y");
+        //  Debug.Log(gameObject.transform.rotation.y + "y");
         //Debug.Log(gameObject.transform.rotation.z + "z");
 
         UpdateGrounded();
 
         UpdateFlipped();
-        
+
+        speedometer = Mathf.FloorToInt(speed);
+        betterspeed = (speedometer / 7);
+        displayspeed = betterspeed.ToString();
+        textbox.text = displayspeed;
+        Debug.Log(displayspeed);
+
+        count = (count + 1);
+        thescore = count.ToString();
+        score.text = "score " + thescore;
+        PlayerPrefs.SetInt("PlayerScore", count);
+
+
 
         // velocoty
         //forward
-       /* if (Input.GetKeyUp("w"))
-        {
-            forward = false;
-        }
-        if (Input.GetKeyDown("w"))
-        {
-            forward = true;          
-        }*/
+        /* if (Input.GetKeyUp("w"))
+         {
+             forward = false;
+         }
+         if (Input.GetKeyDown("w"))
+         {
+             forward = true;          
+         }*/
         //backward
         if (Input.GetKeyUp("s"))
         {
@@ -85,22 +109,23 @@ public class CarMovement : MonoBehaviour {
         //forward
         if (forward && isGrounded)
         {
-           // Debug.Log("jeys");
+            // Debug.Log("jeys");
             speed += acceleration;
         }
         else
         {
-           // Debug.Log("noooo");
-            if (speed > 0) {
+            // Debug.Log("noooo");
+            if (speed > 0)
+            {
                 speed -= resistance;
-                if (speed < 0 )
+                if (speed < 0)
                 {
                     speed = 0;
                 }
             }
         }
         //backward
-        if (backward && isGrounded )
+        if (backward && isGrounded)
         {
             if (speed > 0)
             {
@@ -130,13 +155,13 @@ public class CarMovement : MonoBehaviour {
                     speed = 0;
                 }
             }
-            else 
+            else
             {
                 speed += handbrakeStrength;
                 if (speed > 0)
                 {
                     speed = 0;
-                }      
+                }
             }
         }
 
@@ -161,7 +186,7 @@ public class CarMovement : MonoBehaviour {
             left = true;
         }
         //right
-        if (right  && isGrounded && speed!=0)
+        if (right && isGrounded && speed != 0)
         {
             steeringAngle += steeringInput;
         }
@@ -177,7 +202,7 @@ public class CarMovement : MonoBehaviour {
             }
         }
         //left
-        if (left  && isGrounded && speed!=0)
+        if (left && isGrounded && speed != 0)
         {
             steeringAngle -= steeringInput;
         }
@@ -204,14 +229,14 @@ public class CarMovement : MonoBehaviour {
         Vector3 velocity = Vector3.forward * speed;
         //steering
         Vector3 steering = Vector3.up * steeringAngle;
-        
+
         // move car
         //forward
         transform.Translate(velocity * Time.deltaTime);
         //steering
         transform.Rotate(steering * Time.deltaTime);
 
-       // Debug.Log(isGrounded);
+        // Debug.Log(isGrounded);
 
 
     }
@@ -226,7 +251,7 @@ public class CarMovement : MonoBehaviour {
         else
         {
             groundDistance = 35f;
-          //  Debug.Log(groundDistance);
+            //  Debug.Log(groundDistance);
         }
 
 

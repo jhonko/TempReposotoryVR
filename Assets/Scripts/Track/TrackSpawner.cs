@@ -15,8 +15,6 @@ public class TrackSpawner : MonoBehaviour {
     private float deleteDelay = 2000f;
     private int amnOfTracksOnScreen = 15;
 
-   
-
     private int lastPrefabIndex;
 
     private List<GameObject> activeTrack;
