@@ -7,13 +7,14 @@ public class CarMovement : MonoBehaviour {
     public Vector3 velocity;
     public Vector3 steering;
     
-    private float acceleration = 0f;
     private float brakeAcceleration = 15f;
 
     private float resistance = 0.075f;
     private float speed;
     private float maxSpeed = 700.0f;
-    private float handbrakeStrength = 0.3f;
+
+    private float m_lastPressed;
+
 
     private float steeringAngle;
     private float steeringInput = 1f;
@@ -23,11 +24,17 @@ public class CarMovement : MonoBehaviour {
     public float groundDistance;
     public LayerMask layer;
 
-    private bool forward = true;
-    private bool backward;
+    private bool wKeyLock = false;
+    private bool sKeyLock = false;
+
+
+
     private bool right;
     private bool left;
-    private bool handbrake;
+
+    public int carMovementState = 1;
+    public int speedState = 1;
+    
     private bool isGrounded;
 
     public Rigidbody thisRB;
@@ -43,103 +50,95 @@ public class CarMovement : MonoBehaviour {
 
 	void Update ()
     {
-        //Debug.Log(gameObject.transform.rotation.x + "x");
-      //  Debug.Log(gameObject.transform.rotation.y + "y");
-        //Debug.Log(gameObject.transform.rotation.z + "z");
-
         UpdateGrounded();
 
-        UpdateFlipped();
-        
+        CheckForInput();
 
-        // velocoty
-        //forward
-       /* if (Input.GetKeyUp("w"))
+        ApplyInput();
+        //Debug.Log("speed: " + speed);
+        Debug.Log("carMovementState: "+ carMovementState);
+        Debug.Log("speedState: " + speedState);
+    }
+
+    public void UpdateGrounded()
+    {
+        if (isGrounded)
         {
-            forward = false;
-        }
-        if (Input.GetKeyDown("w"))
-        {
-            forward = true;          
-        }*/
-        //backward
-        if (Input.GetKeyUp("s"))
-        {
-            backward = false;
-            forward = true;
-        }
-        if (Input.GetKeyDown("s"))
-        {
-            backward = true;
-            forward = false;
-        }
-        //handbrake
-        if (Input.GetKeyUp("space"))
-        {
-            handbrake = false;
-        }
-        if (Input.GetKeyDown("space"))
-        {
-            handbrake = true;
-        }
-        //forward
-        if (forward && isGrounded)
-        {
-           // Debug.Log("jeys");
-            speed += acceleration;
+            groundDistance = 25f;
+            //Debug.Log(groundDistance);
         }
         else
         {
-           // Debug.Log("noooo");
-            if (speed > 0) {
-                speed -= resistance;
-                if (speed < 0 )
-                {
-                    speed = 0;
-                }
-            }
+            groundDistance = 35f;
+          //  Debug.Log(groundDistance);
         }
-        //backward
-        if (backward && isGrounded )
-        {
-            if (speed > 0)
-            {
-                speed -= brakeAcceleration;
-
-            }
-        }
+        if (Physics.Raycast(transform.position - new Vector3(0, 0.1f, 0), -transform.up, groundDistance, layer))
+            isGrounded = true;
         else
+            isGrounded = false;
+    }
+
+    public void CheckForInput()
+    {
+        if (sKeyLock == false)
         {
-            if (speed < 0)
+            sKeyLock = true;
+            if (Input.GetKeyDown("s"))
             {
-                speed += resistance;
-                if (speed > 0)
+                if (carMovementState == 2)
                 {
-                    speed = 0;
+                    speedState = 1;
                 }
-            }
-        }
-        //handbrake
-        if (handbrake && isGrounded)
-        {
-            if (speed > 0)
-            {
-                speed -= handbrakeStrength;
-                if (speed < 0)
+                if (carMovementState == 1)
                 {
-                    speed = 0;
+                    speedState = 0;
                 }
-            }
-            else 
-            {
-                speed += handbrakeStrength;
-                if (speed > 0)
-                {
-                    speed = 0;
-                }      
+                
             }
         }
 
+        if (sKeyLock == true)
+        {
+            sKeyLock = false;
+            if (Input.GetKeyUp("s"))
+            {
+                carMovementState = speedState;
+                
+            }
+            
+        }
+
+        if (wKeyLock == false) {
+
+            wKeyLock = true;
+            if (Input.GetKeyDown("w"))
+            {
+                
+                if (carMovementState == 0)
+                {
+
+                    speedState = 1;
+                }
+                if (carMovementState == 1)
+                {
+                    Debug.Log("wtf komt ie hier");
+                    speedState = 2;
+                }
+                
+            }
+            
+        }
+
+        if (wKeyLock == true)
+        {
+            wKeyLock = false;
+            if (Input.GetKeyUp("w"))
+            {
+                carMovementState = speedState;
+
+            }
+           
+        }
 
         //steering
         //right
@@ -160,8 +159,45 @@ public class CarMovement : MonoBehaviour {
         {
             left = true;
         }
+    }
+
+    public void ApplyInput()
+    {
+        speed = Mathf.Clamp(speed, 0, maxSpeed);
+
+        switch (speedState)
+        {
+            case 0:
+                while (speed > 0)
+                {
+                    speed--;
+                }
+                speed = 0;
+                break;
+            case 1:
+                while (speed > (maxSpeed / 2))
+                {
+                    speed--;
+                }
+                while (speed < (maxSpeed / 2))
+                {
+                    speed++;
+                }
+
+                speed = (maxSpeed / 2);
+                break;
+            case 2:
+                Debug.Log("750?");
+                while (speed < maxSpeed)
+                {
+                    speed++;
+                }
+                speed = maxSpeed;
+                break;
+        }
+
         //right
-        if (right  && isGrounded && speed!=0)
+        if (right && isGrounded && speed != 0)
         {
             steeringAngle += steeringInput;
         }
@@ -177,7 +213,7 @@ public class CarMovement : MonoBehaviour {
             }
         }
         //left
-        if (left  && isGrounded && speed!=0)
+        if (left && isGrounded && speed != 0)
         {
             steeringAngle -= steeringInput;
         }
@@ -194,8 +230,6 @@ public class CarMovement : MonoBehaviour {
         }
 
         // clamp speeds
-        //forward
-        speed = Mathf.Clamp(speed, -maxSpeed, maxSpeed);
         //steering
         steeringAngle = Mathf.Clamp(steeringAngle, -maxSteering, maxSteering);
 
@@ -204,46 +238,17 @@ public class CarMovement : MonoBehaviour {
         Vector3 velocity = Vector3.forward * speed;
         //steering
         Vector3 steering = Vector3.up * steeringAngle;
-        
+
         // move car
         //forward
         transform.Translate(velocity * Time.deltaTime);
         //steering
         transform.Rotate(steering * Time.deltaTime);
 
-       // Debug.Log(isGrounded);
-
-
+        // Debug.Log(isGrounded);
     }
 
-    public void UpdateGrounded()
-    {
-        if (isGrounded)
-        {
-            groundDistance = 25f;
-            //Debug.Log(groundDistance);
-        }
-        else
-        {
-            groundDistance = 35f;
-          //  Debug.Log(groundDistance);
-        }
 
-
-        if (Physics.Raycast(transform.position - new Vector3(0, 0.1f, 0), -transform.up, groundDistance, layer))
-            isGrounded = true;
-        else
-            isGrounded = false;
-
-    }
-
-    public void UpdateFlipped()
-    {
-        if (Vector3.Dot(transform.up, Vector3.down) > 0)
-        {
-            //Debug.Log("flipped");
-        }
-    }
 
 
 
