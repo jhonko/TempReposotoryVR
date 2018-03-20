@@ -12,7 +12,7 @@ public class TouchController : MonoBehaviour {
 
     void Update () {
 
-        Debug.Log(OVRInput.IsControllerConnected(OVRInput.Controller.RTouch));
+        //Debug.Log(OVRInput.IsControllerConnected(OVRInput.Controller.RTouch));
         
         transform.localPosition = OVRInput.GetLocalControllerPosition(thisController);
         transform.localRotation = OVRInput.GetLocalControllerRotation(thisController);
