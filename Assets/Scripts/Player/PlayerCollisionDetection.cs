@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerCollisionDetection : MonoBehaviour {
 
-   /* void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.tag == "JayWalker")
         {
@@ -17,7 +17,7 @@ public class PlayerCollisionDetection : MonoBehaviour {
             PlayerPoints.pointsModifier = 1f;
             PlayerPoints.MinusPoints();
         }
-    }*/
+    }
 
     public void EndGame()
     {
