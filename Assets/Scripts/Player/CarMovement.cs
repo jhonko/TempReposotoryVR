@@ -2,19 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class CarMovement : MonoBehaviour {
 
-    public Vector3 velocity;
-    public Vector3 steering;
-    
-    private float brakeAcceleration = 15f;
-
-    private float resistance = 0.075f;
     private float speed;
     private float maxSpeed = 700.0f;
-
-    private float m_lastPressed;
-
 
     private float steeringAngle;
     private float steeringInput = 1f;
@@ -24,16 +16,14 @@ public class CarMovement : MonoBehaviour {
     public float groundDistance;
     public LayerMask layer;
 
-    private bool wKeyLock = false;
-    private bool sKeyLock = false;
-
-
+    private bool buttonOneLock = false;
+    private bool buttonTwoLock = false;
 
     private bool right;
     private bool left;
 
-    public int carMovementState = 1;
-    public int speedState = 1;
+    public int carMovementState = 0;
+    public int speedState = 0;
     
     private bool isGrounded;
 
@@ -50,14 +40,14 @@ public class CarMovement : MonoBehaviour {
 
 	void Update ()
     {
+        OVRInput.Update();
+        OVRInput.FixedUpdate();
+
         UpdateGrounded();
 
         CheckForInput();
 
         ApplyInput();
-        //Debug.Log("speed: " + speed);
-        Debug.Log("carMovementState: "+ carMovementState);
-        Debug.Log("speedState: " + speedState);
     }
 
     public void UpdateGrounded()
@@ -65,12 +55,10 @@ public class CarMovement : MonoBehaviour {
         if (isGrounded)
         {
             groundDistance = 25f;
-            //Debug.Log(groundDistance);
         }
         else
         {
             groundDistance = 35f;
-          //  Debug.Log(groundDistance);
         }
         if (Physics.Raycast(transform.position - new Vector3(0, 0.1f, 0), -transform.up, groundDistance, layer))
             isGrounded = true;
@@ -80,10 +68,10 @@ public class CarMovement : MonoBehaviour {
 
     public void CheckForInput()
     {
-        if (sKeyLock == false)
+        if (buttonOneLock == false)
         {
-            sKeyLock = true;
-            if (Input.GetKeyDown("s"))
+            buttonOneLock = true;
+            if (OVRInput.GetDown(OVRInput.Button.One))
             {
                 if (carMovementState == 2)
                 {
@@ -93,51 +81,40 @@ public class CarMovement : MonoBehaviour {
                 {
                     speedState = 0;
                 }
-                
             }
         }
 
-        if (sKeyLock == true)
+        if (buttonOneLock == true)
         {
-            sKeyLock = false;
-            if (Input.GetKeyUp("s"))
+            buttonOneLock = false;
+            if (OVRInput.GetUp(OVRInput.Button.One))
             {
                 carMovementState = speedState;
-                
             }
-            
-        }
+        }  
 
-        if (wKeyLock == false) {
-
-            wKeyLock = true;
-            if (Input.GetKeyDown("w"))
-            {
-                
+        if (buttonTwoLock == false) {
+                buttonTwoLock = true;
+            if (OVRInput.GetDown(OVRInput.Button.Two))
+            {               
                 if (carMovementState == 0)
                 {
-
                     speedState = 1;
                 }
                 if (carMovementState == 1)
-                {
-                    Debug.Log("wtf komt ie hier");
+                {              
                     speedState = 2;
-                }
-                
-            }
-            
+                } 
+            }  
         }
 
-        if (wKeyLock == true)
+        if (buttonTwoLock == true)
         {
-            wKeyLock = false;
-            if (Input.GetKeyUp("w"))
+                buttonTwoLock = false;
+            if (OVRInput.GetUp(OVRInput.Button.Two))
             {
                 carMovementState = speedState;
-
-            }
-           
+            }    
         }
 
         //steering
@@ -187,7 +164,7 @@ public class CarMovement : MonoBehaviour {
                 speed = (maxSpeed / 2);
                 break;
             case 2:
-                Debug.Log("750?");
+
                 while (speed < maxSpeed)
                 {
                     speed++;
@@ -244,16 +221,5 @@ public class CarMovement : MonoBehaviour {
         transform.Translate(velocity * Time.deltaTime);
         //steering
         transform.Rotate(steering * Time.deltaTime);
-
-        // Debug.Log(isGrounded);
     }
-
-
-
-
-
-
-
-
-
 }

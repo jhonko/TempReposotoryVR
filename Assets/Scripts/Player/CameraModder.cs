@@ -60,7 +60,7 @@ public class CameraModder : MonoBehaviour {
 
     public void Refresh()
     {
-        // compute position
+        /*// compute position
         if (offsetPositionSpace == Space.Self)
         {
             transform.position = player.TransformPoint(offSet);
@@ -68,7 +68,7 @@ public class CameraModder : MonoBehaviour {
         else
         {
             transform.position = player.position + offSet;
-        }
+        }*/
 
         // compute rotation
         if (lookAt)
