@@ -26,4 +26,9 @@ public class SceneHandeller : MonoBehaviour {
     {
         Application.Quit();
     }
+
+    public void OptionsMenu()
+    {
+        SceneManager.LoadScene("OptionsScene");
+    } 
 }
